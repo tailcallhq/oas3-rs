@@ -30,6 +30,12 @@ pub enum Type {
     Array,
     Object,
 }
+#[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
+#[serde(untagged)]
+pub enum ObjectOrFalse<T> {
+    False(bool),
+    Object(T),
+}
 
 // FIXME: Verify against OpenAPI 3.0
 /// The Schema Object allows the definition of input and output data types.
@@ -84,7 +90,7 @@ pub struct Schema {
     /// See <https://github.com/OAI/OpenAPI-Specification/blob/HEAD/versions/3.1.0.md#properties>.
     #[serde(rename = "additionalProperties")]
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub additional_properties: Option<Box<ObjectOrReference<Schema>>>,
+    pub additional_properties: Option<Box<ObjectOrFalse<ObjectOrReference<Schema>>>>,
 
     //
     // additional metadata
@@ -104,7 +110,7 @@ pub struct Schema {
     #[serde(default)]
     #[serde(rename = "enum")]
     #[serde(skip_serializing_if = "Vec::is_empty")]
-    pub enum_values: Vec<String>,
+    pub enum_values: Vec<serde_yaml::Value>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub pattern: Option<String>,
